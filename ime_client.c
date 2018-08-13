@@ -1,3 +1,9 @@
+/**
+* Infinite Memory Engine - IME native wrapper
+*
+* Copyright (c) 2018, DataDirect Networks.
+******************************************************************************/
+
 #include "ime_native.h"
 
 #include <stdbool.h>
