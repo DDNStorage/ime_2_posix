@@ -53,6 +53,14 @@ int     ime_native_close(int fd)
 {
     return close(fd);
 }
+ssize_t ime_native_write(int fd, const char *buf, size_t count)
+{
+    return write(fd, buf, count);
+}
+ssize_t ime_native_read(int fd, char *buf, size_t count)
+{
+    return read(fd, buf, count);
+}
 ssize_t ime_native_pwrite(int fd, const char *buf, size_t count, off_t offset)
 {
     return pwrite(fd, buf, count, offset);
@@ -70,6 +78,10 @@ ssize_t ime_native_preadv(int fd, const struct iovec *iov,
                           int iovcnt, off_t offset)
 {
     return preadv(fd, iov, iovcnt, offset);
+}
+int     ime_native_dup2(int oldfd, int newfd)
+{
+    return dup2(oldfd, newfd);
 }
 off_t   ime_native_lseek(int fd, off_t offset, int whence)
 {

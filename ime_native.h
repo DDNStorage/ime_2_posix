@@ -35,6 +35,8 @@ struct ime_aiocb
 void    ime_native_init(void);
 int     ime_native_open(const char *pathname, int flags, mode_t mode);
 int     ime_native_close(int fd);
+ssize_t ime_native_write(int fd, const char *buf, size_t count);
+ssize_t ime_native_read(int fd, char *buf, size_t count);
 ssize_t ime_native_pwrite(int fd, const char *buf, size_t count, off_t offset);
 ssize_t ime_native_pread(int fd, char *buf, size_t count, off_t offset);
 ssize_t ime_native_pwritev(int fd, const struct iovec *iov,
@@ -43,6 +45,7 @@ ssize_t ime_native_preadv(int fd, const struct iovec *iov,
                           int iovcnt, off_t offset);
 int     ime_native_aio_write(struct ime_aiocb *aiocb);
 int     ime_native_aio_read(struct ime_aiocb *aiocb);
+int     ime_native_dup2(int oldfd, int newfd);
 off_t   ime_native_lseek(int fd, off_t offset, int whence);
 int     ime_native_finalize(void);
 int     ime_native_stat(const char *pathname, struct stat *buf);
