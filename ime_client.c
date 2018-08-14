@@ -4,6 +4,9 @@
 * Copyright (c) 2018, DataDirect Networks.
 ******************************************************************************/
 
+#define _XOPEN_SOURCE 500 /* for pread/pwrite */
+#define _BSD_SOURCE /* for preadv/pwritev */
+
 #include "ime_native.h"
 
 #include <stdbool.h>
@@ -17,6 +20,9 @@
 #include <sys/uio.h>
 #include <errno.h>
 #include <strings.h>
+
+#define IME_PATH_PREFIX "ime://"
+#define IME_PATH_PREFIX_LEN 6
 
 #ifdef USE_LIO
 #include <stdlib.h>
@@ -39,74 +45,90 @@ int     ime_native_open(const char *pathname, int amode, mode_t perm)
     int fd = -1;
     const char* real_path = strncasecmp("ime://", pathname, 6) ?
                             NULL : pathname + 6;
-    
+
     if (real_path != NULL) {
         fd = open (real_path, amode, perm);
     }
     else {
         errno = ENOENT;
     }
-    
+
     return fd;
 }
-int     ime_native_close(int fd)
+
+int ime_native_close(int fd)
 {
     return close(fd);
 }
+
 ssize_t ime_native_write(int fd, const char *buf, size_t count)
 {
     return write(fd, buf, count);
 }
+
 ssize_t ime_native_read(int fd, char *buf, size_t count)
 {
     return read(fd, buf, count);
 }
+
 ssize_t ime_native_pwrite(int fd, const char *buf, size_t count, off_t offset)
 {
     return pwrite(fd, buf, count, offset);
 }
+
 ssize_t ime_native_pread(int fd, char *buf, size_t count, off_t offset)
 {
     return pread(fd, buf, count, offset);
 }
+
 ssize_t ime_native_pwritev(int fd, const struct iovec *iov,
                            int iovcnt, off_t offset)
 {
     return pwritev(fd, iov, iovcnt, offset);
 }
+
 ssize_t ime_native_preadv(int fd, const struct iovec *iov,
                           int iovcnt, off_t offset)
 {
     return preadv(fd, iov, iovcnt, offset);
 }
-int     ime_native_dup2(int oldfd, int newfd)
+
+int ime_native_dup2(int oldfd, int newfd)
 {
     return dup2(oldfd, newfd);
 }
-off_t   ime_native_lseek(int fd, off_t offset, int whence)
+
+off_t ime_native_lseek(int fd, off_t offset, int whence)
 {
     return lseek(fd, offset, whence);
 }
-int     ime_native_finalize(void)
+
+int ime_native_finalize(void)
 {
     printf("call to IME native finalize\n");
     return 0;
 }
-int     ime_native_stat(const char *pathname, struct stat *statbuffer)
+
+static const char *get_real_path(const char *pathname)
 {
-    const char* real_path = strncasecmp("ime://", pathname, 6) ?
-                            NULL : pathname + 6;
-    
+	return strncasecmp(IME_PATH_PREFIX, pathname, IME_PATH_PREFIX_LEN) ?
+		                            NULL : pathname + IME_PATH_PREFIX_LEN;
+}
+
+int ime_native_stat(const char *pathname, struct stat *statbuffer)
+{
+    const char* real_path = get_real_path(pathname);
+
     if (real_path == NULL) {
         errno = ENOENT;
         return -1;
     }
     return stat(real_path, statbuffer);
 }
-int     ime_native_unlink(const char *pathname)
+
+int ime_native_unlink(const char *pathname)
 {
-    const char* real_path = strncasecmp("ime://", pathname, 6) ?
-                            NULL : pathname + 6;
+    const char* real_path = get_real_path(pathname);
 
     if (real_path == NULL) {
         errno = ENOENT;
@@ -114,17 +136,19 @@ int     ime_native_unlink(const char *pathname)
     }
     return unlink(real_path);
 }
-int     ime_native_fsync(int fd)
+
+int ime_native_fsync(int fd)
 {
     return fsync(fd);
 }
-int     ime_native_ftruncate(int fd, off_t offset)
+
+int ime_native_ftruncate(int fd, off_t offset)
 {
     return ftruncate(fd, offset);
 }
 
 #ifdef USE_LIO
-static void aio_end_callback (union sigval val)
+static void aio_end_callback(union sigval val)
 {
     ssize_t ret, bytes;
     struct ime_data *ime_d = val.sival_ptr;
@@ -144,7 +168,8 @@ exit_free:
     free(ime_d->aiocb_list);
     free(ime_d);
 }
-static int aio_op (struct ime_aiocb *aiocb, int lio_opcode)
+
+static int aio_op(struct ime_aiocb *aiocb, int lio_opcode)
 {
     if (aiocb->iovcnt == 0) {
         aiocb->complete_cb(aiocb, 0, 0);
@@ -152,7 +177,6 @@ static int aio_op (struct ime_aiocb *aiocb, int lio_opcode)
     }
 
     /* allocate some memory to store the list IO requests */
-    errno = 0;
     struct ime_data *ime_d = malloc(sizeof(struct ime_data));
     struct aiocb *aiocb_array;
     if (ime_d == NULL) {
@@ -193,7 +217,7 @@ static int aio_op (struct ime_aiocb *aiocb, int lio_opcode)
 
         offset += aiocb_array[i].aio_nbytes;
     }
-    
+
     /* send the IOs */
     int res = lio_listio(LIO_NOWAIT, ime_d->aiocb_list, aiocb->iovcnt, sigev);
     if (res < 0) {
@@ -201,13 +225,15 @@ static int aio_op (struct ime_aiocb *aiocb, int lio_opcode)
         free(ime_d);
         return -1;
     }
-    
+
     return 0;
 }
+
 int ime_native_aio_read(struct ime_aiocb *aiocb)
 {
     return aio_op(aiocb, LIO_READ);
 }
+
 int ime_native_aio_write(struct ime_aiocb *aiocb)
 {
     return aio_op(aiocb, LIO_WRITE);
