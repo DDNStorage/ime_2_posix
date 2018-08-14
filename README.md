@@ -6,10 +6,10 @@ It is used to mock IME native calls using POSIX functions.
 
 To compile with proper AIO support (needs POSIX list IOs):
 ```
-gcc -shared -fpic -DUSE_LIO ime_client.c -o libim_client.so
+make lio
 ```
 
 To compile without proper AIO support (fallback to blocking calls):
 ```
-gcc -shared -fpic ime_client.c -o libim_client.so
+make nolio
 ```
