@@ -5,7 +5,7 @@
 ******************************************************************************/
 
 #define _XOPEN_SOURCE 500 /* for pread/pwrite */
-#define _BSD_SOURCE /* for preadv/pwritev */
+#define _DEFAULT_SOURCE /* for preadv/pwritev */
 
 #include "ime_native.h"
 
