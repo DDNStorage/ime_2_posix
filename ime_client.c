@@ -33,6 +33,8 @@ struct ime_data {
 };
 #endif
 
+const static char mock_version[] = "IME mock native API";
+
 static const char *get_real_path(const char *pathname)
 {
     return strncasecmp(DEFAULT_IME_FILE_PREFIX, pathname,
@@ -260,6 +262,11 @@ int ime_native_aio_read(struct ime_aiocb *aiocb)
 int ime_native_aio_write(struct ime_aiocb *aiocb)
 {
     return aio_op(aiocb, LIO_WRITE);
+}
+
+const char *ime_native_version(void)
+{
+    return mock_version;
 }
 
 #else

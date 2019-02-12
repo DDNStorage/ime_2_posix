@@ -17,6 +17,8 @@
 #include <string.h>
 #include <stdint.h>
 
+#define IME_NATIVE_API_VERSION 130
+
 #define DEFAULT_IME_FILE_PREFIX     "ime://"
 #define DEFAULT_IME_PREFIX_NO_FWD_SLASH "ime:"
 #define DEFAULT_IME_FILE_PREFIX_LEN (sizeof(DEFAULT_IME_FILE_PREFIX) - 1)
@@ -57,6 +59,7 @@ int     ime_native_stat(const char *pathname, struct stat *buf);
 int     ime_native_unlink(const char *pathname);
 int     ime_native_fsync(int fd);
 int     ime_native_ftruncate(int fd, off_t off);
+const char *ime_native_version(void);
 
 #endif
 
