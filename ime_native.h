@@ -12,6 +12,7 @@
 #include <stdio.h>
 #include <sys/uio.h>
 #include <sys/stat.h>
+#include <sys/statvfs.h>
 #include <unistd.h>
 #include <string.h>
 #include <stdint.h>
@@ -33,8 +34,12 @@ struct ime_aiocb
 };
 
 void    ime_native_init(void);
+int     ime_native_access(const char *pathname, int mode);
 int     ime_native_open(const char *pathname, int flags, mode_t mode);
 int     ime_native_close(int fd);
+int     ime_native_mkdir(const char *pathname, mode_t mode);
+int     ime_native_rmdir(const char *pathname);
+int     ime_native_statvfs(const char *pathname, struct statvfs *buf);
 ssize_t ime_native_write(int fd, const char *buf, size_t count);
 ssize_t ime_native_read(int fd, char *buf, size_t count);
 ssize_t ime_native_pwrite(int fd, const char *buf, size_t count, off_t offset);
@@ -54,3 +59,4 @@ int     ime_native_fsync(int fd);
 int     ime_native_ftruncate(int fd, off_t off);
 
 #endif
+

@@ -45,6 +45,12 @@ void ime_native_init(void)
     printf("call to IME native init\n");
 }
 
+int ime_native_access(const char *pathname, int mode)
+{
+    const char* real_path = get_real_path(pathname);
+    return access(real_path, mode);
+}
+
 int ime_native_open(const char *pathname, int amode, mode_t perm)
 {
     int fd = -1;
@@ -61,6 +67,27 @@ int ime_native_open(const char *pathname, int amode, mode_t perm)
 int ime_native_close(int fd)
 {
     return close(fd);
+}
+
+int ime_native_mkdir(const char *pathname, mode_t mode)
+{
+    const char* real_path = get_real_path(pathname);
+
+    return mkdir(real_path, mode);
+}
+
+int ime_native_rmdir(const char *pathname)
+{
+    const char* real_path = get_real_path(pathname);
+
+    return rmdir(real_path);
+}
+
+int ime_native_statvfs(const char *pathname, struct statvfs *buf)
+{
+    const char* real_path = get_real_path(pathname);
+
+    return statvfs(real_path, buf);
 }
 
 ssize_t ime_native_write(int fd, const char *buf, size_t count)
