@@ -44,7 +44,7 @@ static const char *get_real_path(const char *pathname)
 
 void ime_native_init(void)
 {
-    printf("call to IME native init\n");
+    /* Nothing to do */
 }
 
 int ime_native_access(const char *pathname, int mode)
@@ -136,7 +136,7 @@ off_t ime_native_lseek(int fd, off_t offset, int whence)
 
 int ime_native_finalize(void)
 {
-    printf("call to IME native finalize\n");
+    /* Nothing to do */
     return 0;
 }
 
@@ -170,6 +170,11 @@ int ime_native_fsync(int fd)
 int ime_native_ftruncate(int fd, off_t offset)
 {
     return ftruncate(fd, offset);
+}
+
+const char *ime_native_version(void)
+{
+    return mock_version;
 }
 
 #ifdef USE_LIO
@@ -262,11 +267,6 @@ int ime_native_aio_read(struct ime_aiocb *aiocb)
 int ime_native_aio_write(struct ime_aiocb *aiocb)
 {
     return aio_op(aiocb, LIO_WRITE);
-}
-
-const char *ime_native_version(void)
-{
-    return mock_version;
 }
 
 #else
