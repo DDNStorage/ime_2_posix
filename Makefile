@@ -9,18 +9,21 @@
 LIB_NAME=libim_client.so
 SRC_FILE=ime_client.c
 HEADER_FILE=ime_native.h
-COMMON_CFLAGS=-std=c99 -shared -fpic -Wall
+COMMON_CFLAGS=-std=c99 -Wall -g -Iime_native/
+EXAMPLES_DIR=examples
 
 all: lio
 
 clean:
 	rm -f *.so
 
-nolio:
-	gcc ${COMMON_CFLAGS} ${SRC_FILE} -o ${LIB_NAME}
+nolio: ime_client.c
+	gcc ${COMMON_CFLAGS} -c -fPIC ${SRC_FILE} -o ${LIB_NAME}.o
+	gcc -shared ${LIB_NAME}.o -o ${LIB_NAME}.so
 
-lio:
-	gcc ${COMMON_CFLAGS} -lrt -DUSE_LIO ${SRC_FILE} -o ${LIB_NAME}
+lio: ime_client.c
+	gcc ${COMMON_CFLAGS} -c -fPIC -ltr -DUSE_LIO ${SRC_FILE} -o ${LIB_NAME}.o
+	gcc -shared ${LIB_NAME}.o -o ${LIB_NAME}.so
 
 install:
 	chmod 644 ${LIB_NAME}
