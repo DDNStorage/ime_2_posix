@@ -26,11 +26,11 @@ lio: ime_client.c
 	gcc -shared ${LIB_NAME}.o -o ${LIB_NAME}.so
 
 install:
-	chmod 644 ${SHARED_LIB_NAME}
+	chmod 644 ${LIB_NAME}.so
 	mkdir -p ${DESTDIR}/opt/ddn/ime/lib/
 	mkdir -p ${DESTDIR}/opt/ddn/ime/include
-	install ${SHARED_LIB_NAME} ${DESTDIR}/opt/ddn/ime/lib/
-	install ${HEADER_FILE} ${DESTDIR}/opt/ddn/ime/include
+	install ${LIB_NAME}.so ${DESTDIR}/opt/ddn/ime/lib/
+	install ime_native/${HEADER_FILE} ${DESTDIR}/opt/ddn/ime/include
 
 examples: ${EXAMPLES_DIR}/write.c
 	gcc ${COMMON_CFLAGS} ${EXAMPLES_DIR}/write.c -o ${EXAMPLES_DIR}/write -L. -Iinclude/ -lim_client
